@@ -50,7 +50,13 @@ impl Cpu {
     }
 
     #[wasm_bindgen(constructor)]
-    pub fn new(mem: &[u8], eeprom: &mut mem::EEPROM, keyboard: &mut Keyboard, pia1: &mut PIA, pia2: &mut PIA) -> Cpu {
+    pub fn new(
+        mem: &[u8],
+        eeprom: &mut mem::EEPROM,
+        keyboard: &mut Keyboard,
+        pia1: &mut PIA,
+        pia2: &mut PIA,
+    ) -> Cpu {
         unsafe {
             Cpu {
                 cpu: cpu::Cpu::new(MemMap::new(

@@ -43,6 +43,7 @@ impl Mem for Ram {
 #[wasm_bindgen]
 pub struct EEPROM {
     val:          [u8; 0x2000],
+    #[wasm_bindgen(readonly)]
     pub writable: bool,
 }
 
@@ -107,7 +108,7 @@ impl<'a> Mem for MemMap<'a> {
     fn read(&self, addr: u16) -> u8 {
         if addr < 0x2000 {
             // EEPROM
-            self.ram.read(addr)
+            self.eeprom.read(addr)
         } else if addr < 0x2600 {
             // RAM
             self.ram.read(addr)
@@ -161,7 +162,7 @@ impl<'a> Mem for MemMap<'a> {
     fn store(&mut self, addr: u16, val: u8) {
         if addr <= 0x1FFF {
             // EEPROM
-            self.ram.store(addr, val)
+            self.eeprom.store(addr, val)
         } else if addr < 0x2600 {
             // RAM
             self.ram.store(addr, val)

@@ -2,6 +2,7 @@
   "name": "m6809-web",
   "version": "1.0.0",
   "scripts": {
+    "start": "yarn serve",
     "serve": "webpack-serve"
   },
   "serve": {
