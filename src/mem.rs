@@ -1,6 +1,5 @@
 use keyboard::Keyboard;
 use pia::PIA;
-use wasm_bindgen::prelude::*;
 
 pub trait Mem {
     fn read(&self, addr: u16) -> u8;
@@ -14,6 +13,8 @@ pub trait Mem {
         self.store(addr, (val & 0xFF) as u8);
         self.store(addr + 1, ((val >> 8) & 0xFF) as u8);
     }
+
+    fn copy_into(&self, slice: &mut [u8]);
 }
 
 pub struct Ram {
@@ -28,26 +29,23 @@ impl Ram {
 
 impl Mem for Ram {
     fn read(&self, addr: u16) -> u8 {
-        // Why?
-        //self.val[addr as usize & 0x7FF]
         self.val[addr as usize & 0xFFFF]
     }
 
     fn store(&mut self, addr: u16, val: u8) {
-        // Why?
-        //self.val[addr as usize & 0x7FF] = val;
         self.val[addr as usize & 0xFFFF] = val;
+    }
+
+    fn copy_into(&self, slice: &mut [u8]) {
+        slice.copy_from_slice(&self.val);
     }
 }
 
-#[wasm_bindgen]
 pub struct EEPROM {
-    val:          [u8; 0x2000],
-    #[wasm_bindgen(readonly)]
+    pub val:      [u8; 0x2000],
     pub writable: bool,
 }
 
-#[wasm_bindgen]
 impl EEPROM {
     pub fn lock(&mut self) {
         self.writable = false;
@@ -57,10 +55,9 @@ impl EEPROM {
         self.writable = true;
     }
 
-    #[wasm_bindgen(constructor)]
-    pub fn new() -> EEPROM {
+    pub fn new(val: [u8; 0x2000]) -> EEPROM {
         EEPROM {
-            val:      [0; 0x2000],
+            val,
             writable: false,
         }
     }
@@ -75,6 +72,10 @@ impl Mem for EEPROM {
         if self.writable {
             self.val[addr as usize & 0x1FFF] = val;
         }
+    }
+
+    fn copy_into(&self, slice: &mut [u8]) {
+        slice.copy_from_slice(&self.val);
     }
 }
 
@@ -160,7 +161,7 @@ impl<'a> Mem for MemMap<'a> {
     }
 
     fn store(&mut self, addr: u16, val: u8) {
-        if addr <= 0x1FFF {
+        if addr < 0x2000 {
             // EEPROM
             self.eeprom.store(addr, val)
         } else if addr < 0x2600 {
@@ -202,5 +203,13 @@ impl<'a> Mem for MemMap<'a> {
             // EPROM
             self.ram.store(addr, val)
         }
+    }
+
+    fn copy_into(&self, slice: &mut [u8]) {
+        slice.copy_from_slice(&self.ram.val);
+        slice[0x0000..0x2000].copy_from_slice(&self.eeprom.val);
+        slice[0x2800..0x2900].copy_from_slice(&self.pia1.val);
+        slice[0x2900..0x2A00].copy_from_slice(&self.pia2.val);
+        slice[0x2E00..0x2F00].copy_from_slice(&self.keyboard.keys);
     }
 }

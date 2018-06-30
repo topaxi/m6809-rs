@@ -1,4 +1,4 @@
-import { Cpu, EEPROM, Keyboard, PIA } from './m6809'
+import { Cpu, EEPROM, Keyboard, PIA } from '../m6809'
 
 export default class Kit {
   readonly eeprom = new EEPROM()
@@ -17,7 +17,7 @@ export default class Kit {
     )
     this.eeprom.unlock()
     loadSubroutines(this.cpu)
-    load(this.cpu)
+    load3c(this.cpu)
     this.eeprom.lock()
   }
 }

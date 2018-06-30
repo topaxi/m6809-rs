@@ -9,6 +9,15 @@ use std::ops::Deref;
 use std::ops::DerefMut;
 use wasm_bindgen::prelude::*;
 
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = window, js_name = saveEEPROM)]
+    fn save_eeprom(eeprom: Vec<u8>);
+
+    #[wasm_bindgen(js_namespace = window, js_name = loadEEPROM)]
+    fn load_eeprom() -> Vec<u8>;
+}
+
 macro_rules! to_array {
     ($bytes:expr, $x:expr) => {{
         let mut array = [0; $x];
@@ -25,6 +34,12 @@ pub struct Cpu {
 
 #[wasm_bindgen]
 impl Cpu {
+    pub fn dump(&self) -> Vec<u8> {
+        let mut mem = [0; 0x10000];
+        self.cpu.copy_into(&mut mem);
+        mem.to_vec()
+    }
+
     pub fn read(&self, addr: u16) -> u8 {
         self.cpu.read(addr)
     }
@@ -34,7 +49,7 @@ impl Cpu {
     }
 
     pub fn go(&mut self, addr: u16) {
-        self.cpu.pc = addr;
+        self.cpu.go(addr);
     }
 
     pub fn step(&mut self) -> u32 {
@@ -52,7 +67,7 @@ impl Cpu {
     #[wasm_bindgen(constructor)]
     pub fn new(
         mem: &[u8],
-        eeprom: &mut mem::EEPROM,
+        eeprom: &mut EEPROM,
         keyboard: &mut Keyboard,
         pia1: &mut PIA,
         pia2: &mut PIA,
@@ -70,6 +85,61 @@ impl Cpu {
                 )),
             }
         }
+    }
+}
+
+#[wasm_bindgen]
+pub struct EEPROM {
+    eeprom: mem::EEPROM,
+    #[wasm_bindgen(readonly)]
+    pub writable: bool,
+}
+
+#[wasm_bindgen]
+impl EEPROM {
+    pub fn read(&self, addr: u16) -> u8 {
+        self.eeprom.read(addr)
+    }
+
+    pub fn store(&mut self, addr: u16, byte: u8) {
+        self.eeprom.store(addr, byte)
+    }
+
+    pub fn lock(&mut self) {
+        self.writable = false;
+        self.eeprom.lock();
+        save_eeprom(self.eeprom.val.to_vec())
+    }
+
+    pub fn unlock(&mut self) {
+        self.writable = true;
+        self.eeprom.unlock()
+    }
+
+    pub fn dump(&self) -> Vec<u8> {
+        self.eeprom.val.to_vec()
+    }
+
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> EEPROM {
+        EEPROM {
+            eeprom:   mem::EEPROM::new(to_array!(load_eeprom(), 0x2000)),
+            writable: false,
+        }
+    }
+}
+
+impl Deref for EEPROM {
+    type Target = mem::EEPROM;
+
+    fn deref(&self) -> &mem::EEPROM {
+        &self.eeprom
+    }
+}
+
+impl DerefMut for EEPROM {
+    fn deref_mut(&mut self) -> &mut mem::EEPROM {
+        &mut self.eeprom
     }
 }
 

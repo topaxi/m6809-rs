@@ -1,4 +1,5 @@
 #![feature(nll)]
+#![feature(generic_associated_types)]
 #![feature(proc_macro, wasm_custom_section, wasm_import_module)]
 #![feature(tool_attributes, proc_macro_path_invoc)]
 

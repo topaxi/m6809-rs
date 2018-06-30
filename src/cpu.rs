@@ -1,21 +1,4 @@
 use mem::Mem;
-use wasm_bindgen::prelude::*;
-
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u8(a: u8);
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u16(a: u16);
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u32(a: u32);
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u16_u8(a: u16, b: u8);
-    #[wasm_bindgen(js_namespace = window, js_name = logOpcode)]
-    fn log_opcode(pc: u16, op: u8);
-}
 
 const CARRY_FLAG: u8 = 1 << 0;
 const OVERFLOW_FLAG: u8 = 1 << 1;
@@ -84,24 +67,24 @@ enum AddrType {
 }
 
 pub struct Cpu<M: Mem> {
-    pub ix: u16,
-    pub iy: u16,
+    ix: u16,
+    iy: u16,
 
-    pub su: u16,
-    pub ss: u16,
+    su: u16,
+    ss: u16,
 
-    pub pc: u16,
+    pc: u16,
 
-    pub aa: u8,
-    pub ab: u8,
+    aa: u8,
+    ab: u8,
 
-    pub dp: u8,
-    pub cc: u8,
+    dp: u8,
+    cc: u8,
 
-    pub mem: M,
-    pub stk: [u16; 16],
+    mem: M,
+    stk: [u16; 16],
 
-    pub cy: u64,
+    cy: u64,
 
     addr_type: AddrType,
 }
@@ -113,6 +96,10 @@ impl<M: Mem> Mem for Cpu<M> {
 
     fn store(&mut self, addr: u16, val: u8) {
         self.mem.store(addr, val);
+    }
+
+    fn copy_into(&self, mut slice: &mut [u8]) {
+        self.mem.copy_into(&mut slice);
     }
 }
 
@@ -129,6 +116,7 @@ impl<M: Mem> Cpu<M> {
         val
     }
 
+    #[inline(always)]
     fn fetch_operand(&mut self) -> u16 {
         match self.addr_type {
             AddrType::Immediate | AddrType::Relative => self.fetch() as u16,
