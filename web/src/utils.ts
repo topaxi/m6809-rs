@@ -9,3 +9,7 @@ export function formatByte(byte: number): string {
 export function formatWord(word: number): string {
   return toHex(word).padStart(4, '0')
 }
+
+export function range(start, end, project = (v, i) => v) {
+  return Array.from({ length: end - start }, (_, i) => project(start + i, i))
+}

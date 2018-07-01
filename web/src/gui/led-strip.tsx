@@ -1,5 +1,5 @@
 import { PIA } from '../../m6809'
-import { toHex } from '../utils'
+import { toHex, range } from '../utils'
 
 class SwitchHandler {
   constructor(private readonly pia: PIA) {}
@@ -17,11 +17,11 @@ const Switch = attrs => <input {...attrs} type="checkbox" />
 
 export default class LEDStrip {
   private length = 8
-  private readonly leds = Array.from({ length: this.length }, (_v, i) => (
+  private readonly leds = range(0, this.length, i => (
     <LED name={i} value={this.valueFor(i)} />
   ))
   private readonly switchHandler = new SwitchHandler(this.pia)
-  private readonly switches = Array.from({ length: this.length }, (_v, i) => (
+  private readonly switches = range(0, this.length, i => (
     <Switch
       name={toHex(i + this.length)}
       value={this.valueFor(i)}
