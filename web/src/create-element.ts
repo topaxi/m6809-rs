@@ -78,7 +78,7 @@ export default function createElement(
 
   const el = document.createElement(tagName)
   for (let key in attrs) {
-    if (key.slice(0, 2) === 'on') {
+    if (key.startsWith('on')) {
       const evtName = key.slice(2)
       if (attrs[key] != null) {
         el.addEventListener(evtName, attrs[key], attrs[key].handleEventOptions)
