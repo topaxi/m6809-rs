@@ -1,4 +1,4 @@
-use mem::Mem;
+use crate::mem::Mem;
 
 pub struct PIA {
     pub val: [u8; 0x100],

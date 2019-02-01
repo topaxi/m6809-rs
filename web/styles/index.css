@@ -70,3 +70,14 @@ button[value='enable-eeprom'].active::before {
   display: flex;
   flex-flow: row-reverse;
 }
+
+.registers {
+  contain: content;
+  font-family: monospace, 'Fira Code', 'Consolas';
+}
+.registers > dd, .registers > dt {
+  contain: content;
+}
+.registers > dd::before {
+  content: '0x';
+}

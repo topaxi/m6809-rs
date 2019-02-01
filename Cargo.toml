@@ -2,6 +2,7 @@
 name = "m6809-rs"
 version = "0.1.0"
 authors = ["Damian Senn <senn@puzzle.ch>"]
+edition = "2018"
 
 [lib]
 name = "m6809"

@@ -1,4 +1,5 @@
-use mem::Mem;
+use crate::mem::Mem;
+use crate::registers::Registers;
 
 const CARRY_FLAG: u8 = 1 << 0;
 const OVERFLOW_FLAG: u8 = 1 << 1;
@@ -82,7 +83,6 @@ pub struct Cpu<M: Mem> {
     cc: u8,
 
     mem: M,
-    stk: [u16; 16],
 
     cy: u64,
 
@@ -104,6 +104,24 @@ impl<M: Mem> Mem for Cpu<M> {
 }
 
 impl<M: Mem> Cpu<M> {
+    pub fn registers(&self) -> Registers {
+        Registers {
+            ix: self.ix,
+            iy: self.iy,
+
+            su: self.su,
+            ss: self.ss,
+
+            pc: self.pc,
+
+            aa: self.aa,
+            ab: self.ab,
+
+            dp: self.dp,
+            cc: self.cc,
+        }
+    }
+
     fn fetch(&mut self) -> u8 {
         let val = self.read(self.pc);
         self.pc += 1;
@@ -546,7 +564,6 @@ impl<M: Mem> Cpu<M> {
             dp: 0,
             cc: 0,
             mem,
-            stk: [0; 16],
             cy: 0,
             addr_type: AddrType::None,
         }

@@ -1,10 +1,11 @@
-use cpu;
-use keyboard;
-use mem;
-use mem::Mem;
-use mem::MemMap;
-use mem::Ram;
-use pia;
+use crate::cpu;
+use crate::keyboard;
+use crate::mem;
+use crate::mem::Mem;
+use crate::mem::MemMap;
+use crate::mem::Ram;
+use crate::pia;
+use crate::registers::Registers;
 use std::ops::Deref;
 use std::ops::DerefMut;
 use wasm_bindgen::prelude::*;
@@ -38,6 +39,10 @@ impl Cpu {
         let mut mem = [0; 0x10000];
         self.cpu.copy_into(&mut mem);
         mem.to_vec()
+    }
+
+    pub fn registers(&self) -> Registers {
+        self.cpu.registers()
     }
 
     pub fn read(&self, addr: u16) -> u8 {

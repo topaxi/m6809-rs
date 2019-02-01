@@ -1,5 +1,5 @@
-use keyboard::Keyboard;
-use pia::PIA;
+use crate::keyboard::Keyboard;
+use crate::pia::PIA;
 
 pub trait Mem {
     fn read(&self, addr: u16) -> u8;
