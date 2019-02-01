@@ -1,4 +1,5 @@
 import { formatByte, formatWord } from '../utils'
+import { Registers } from '../../m6809'
 
 const Cell = ({ addr, ...rest }, ...children) => (
   <li class="mem-cell" data-addr={formatWord(addr)} {...rest}>
@@ -24,8 +25,9 @@ export default class MemView {
   private toClean = new Set<HTMLLIElement>()
   private cleanupId = null
   private renderId = null
+  private lastRenderPC: HTMLLIElement | null = null
 
-  render(mem: Uint8Array) {
+  render(mem: Uint8Array, registers: Registers) {
     this.container.appendChild(
       <div style={`height: ${mem.length * this.rowHeight}px`} />,
     )
@@ -86,7 +88,12 @@ export default class MemView {
     this.view.appendChild(fragment)
   }
 
-  update(mem: Uint8Array) {
+  update(mem: Uint8Array, registers: Registers) {
+    this.updateMemView(mem)
+    this.updatePCCell(mem, registers)
+  }
+
+  private updateMemView(mem: Uint8Array) {
     for (let i = 0; i < mem.length; i++) {
       if (mem[i] !== this.prevMem[i]) {
         this.memView[i].nodeValue = `0x${formatByte(mem[i])}`
@@ -94,5 +101,16 @@ export default class MemView {
     }
 
     this.prevMem = mem
+  }
+
+  private updatePCCell(mem: Uint8Array, registers: Registers) {
+    let currentPCCell = this.cells[registers.pc]
+    if (this.lastRenderPC !== currentPCCell) {
+      if (this.lastRenderPC !== null) {
+        this.lastRenderPC.classList.remove('pc')
+      }
+      currentPCCell.classList.add('pc')
+      this.lastRenderPC = currentPCCell
+    }
   }
 }

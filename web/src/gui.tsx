@@ -3,7 +3,7 @@ import { formatByte, formatWord } from './utils'
 import LEDStrip from './gui/led-strip'
 import MemView from './gui/mem-view'
 import Keyboard from './gui/keyboard'
-import Registers from './gui/registers';
+import Registers from './gui/registers'
 import Kit from './kit'
 
 export class GUI {
@@ -15,10 +15,12 @@ export class GUI {
   constructor(private readonly kit: Kit) {}
 
   render() {
+    let registers = this.kit.cpu.registers()
+
     return (
       <>
-        {this.memView.render(this.kit.cpu.dump())}
-        {this.registers.render(this.kit.cpu.registers())}
+        {this.memView.render(this.kit.cpu.dump(), registers)}
+        {this.registers.render(registers)}
         {this.keyboard.render(this.kit)}
         {this.ledstrip.render()}
       </>
@@ -26,8 +28,10 @@ export class GUI {
   }
 
   update() {
-    this.memView.update(this.kit.cpu.dump())
-    this.registers.update(this.kit.cpu.registers())
+    let registers = this.kit.cpu.registers()
+
+    this.memView.update(this.kit.cpu.dump(), registers)
+    this.registers.update(registers)
     this.ledstrip.update()
     this.keyboard.update(this.kit.eeprom)
   }

@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -32,7 +34,7 @@ button[value='enable-eeprom'].active::before {
   overflow-y: scroll;
   overflow-x: hidden;
   position: relative;
-  transform: translate3d(0,0,0);
+  transform: translate3d(0, 0, 0);
   font-family: monospace, 'Fira Code', 'Consolas';
   font-size: 16px;
 }
@@ -65,8 +67,12 @@ button[value='enable-eeprom'].active::before {
 .mem-cell::before {
   content: '0x' attr(data-addr) ': ';
 }
+.mem-cell.pc {
+  background-color: red;
+}
 
-.leds, .switches {
+.leds,
+.switches {
   display: flex;
   flex-flow: row-reverse;
 }
@@ -75,7 +81,8 @@ button[value='enable-eeprom'].active::before {
   contain: content;
   font-family: monospace, 'Fira Code', 'Consolas';
 }
-.registers > dd, .registers > dt {
+.registers > dd,
+.registers > dt {
   contain: content;
 }
 .registers > dd::before {
