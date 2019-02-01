@@ -26,8 +26,17 @@ export default class MemView {
   private cleanupId = null
   private renderId = null
   private lastRenderPC: HTMLLIElement | null = null
+  private cleanup = () => {
+    this.cleanupId = null
+    this.toClean.forEach(el => el.remove())
+    this.toClean.clear()
+  }
+  private currentIndex = 0
+  private currentLastIndex = this.limit
 
   render(mem: Uint8Array, registers: Registers) {
+    this.currentLastIndex = Math.min(mem.length, this.limit)
+
     this.container.appendChild(
       <div style={`height: ${mem.length * this.rowHeight}px`} />,
     )
@@ -65,22 +74,19 @@ export default class MemView {
 
   private scheduleNodeRemoval() {
     if (this.cleanupId !== null) window.cancelIdleCallback(this.cleanupId)
-    this.cleanupId = window.requestIdleCallback(() => {
-      this.cleanupId = null
-      this.toClean.forEach(el => el.remove())
-      this.toClean.clear()
-    })
+    this.cleanupId = window.requestIdleCallback(this.cleanup)
   }
 
   renderList(index) {
-    let finalItem = Math.min(this.cells.length, index + this.limit)
+    this.currentIndex = index
+    this.currentLastIndex = Math.min(this.cells.length, index + this.limit)
 
     for (let i = 0; i < this.view.children.length; i++) {
-      this.toClean.add(this.view.children[i] as any)
+      this.toClean.add(this.view.children[i])
     }
 
     let fragment = document.createDocumentFragment()
-    for (let i = index; i < finalItem; i++) {
+    for (let i = index; i < this.currentLastIndex; i++) {
       this.toClean.delete(this.cells[i])
       fragment.appendChild(this.cells[i])
     }
@@ -94,13 +100,12 @@ export default class MemView {
   }
 
   private updateMemView(mem: Uint8Array) {
-    for (let i = 0; i < mem.length; i++) {
+    for (let i = this.currentIndex; i < this.currentLastIndex; i++) {
       if (mem[i] !== this.prevMem[i]) {
         this.memView[i].nodeValue = `0x${formatByte(mem[i])}`
+        this.prevMem[i] = mem[i]
       }
     }
-
-    this.prevMem = mem
   }
 
   private updatePCCell(mem: Uint8Array, registers: Registers) {
