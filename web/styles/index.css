@@ -83,7 +83,8 @@ button[value='enable-eeprom'].active::before {
 }
 .registers > dd,
 .registers > dt {
-  contain: content;
+  contain: strict;
+  height: 1em;
 }
 .registers > dd::before {
   content: '0x';
