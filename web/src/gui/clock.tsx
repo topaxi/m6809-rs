@@ -37,6 +37,7 @@ export default class Clock {
 
   private handleEvent(e: Event) {
     this._hz = this.speed.value
+    this.label.nodeValue = this.formatHertz(this._hz)
   }
 
   private formatHertz(n: number): string {
