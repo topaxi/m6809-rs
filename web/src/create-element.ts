@@ -69,7 +69,7 @@ export default function createElement(
   }
 
   if (typeof tagName === 'function') {
-    return tagName(attrs, ...children);
+    return tagName(attrs, ...children)
   }
 
   if (tagName === 'text') {
@@ -85,6 +85,8 @@ export default function createElement(
       }
     } else if (booleanishPropertyKeys.has(key)) {
       el[key] = attrs[key] == null ? true : attrs[key]
+    } else if (key === 'value') {
+      el[key] = attrs[key]
     } else {
       if (attrs[key] != null) {
         el.setAttribute(key, attrs[key])

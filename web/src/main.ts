@@ -1,10 +1,7 @@
 import Kit from './kit'
 import { GUI } from './gui'
 
-const CPU_HZ = 1.0e6
 let frame = 0
-
-//setTimeout(() => window.cancelAnimationFrame(frame), 1000)
 
 function main(t) {
   let lastFrame = t
@@ -17,11 +14,14 @@ function main(t) {
 
   const runloop = t => {
     let T = t - lastFrame
-    let cycles = Math.min(30, (CPU_HZ * T * 1e-6) >>> 0)
+    let cycles = (gui.clock.hz * T * 1e-6) >>> 0
 
-    kit.cpu.run_cycles(cycles)
-    lastFrame = t
-    gui.update()
+    if (cycles !== 0) {
+      kit.cpu.run_cycles(cycles)
+      lastFrame = t
+      gui.update()
+    }
+
     frame = window.requestAnimationFrame(runloop)
   }
   frame = window.requestAnimationFrame(runloop)
