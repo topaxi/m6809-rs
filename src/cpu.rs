@@ -278,9 +278,7 @@ impl<M: Mem> Cpu<M> {
             (0x36, _) => (), //PSHU
             (0x37, _) => (), //PULU
             //RTS
-            (0x39, _) => {
-                self.pc = self.pull_word_s();
-            },
+            (0x39, _) => self.pc = self.pull_word_s(),
             (0x3A, _) => (), //ABX
             (0x3B, _) => (), //RTI
             (0x3C, _) => (), //CWAI
@@ -335,9 +333,7 @@ impl<M: Mem> Cpu<M> {
             (0x7C, _) => (),    //INC extended
             (0x7D, _) => (),    //TST extended
             //JMP extended
-            (0x7E, _) => {
-                self.pc = self.fetch_operand();
-            },
+            (0x7E, _) => self.pc = self.fetch_operand(),
             (0x7F, _) => (),    //CLR extended
             (0x80, _) => (),    //SUBA imm
             (0x81, _) => (),    //CMPA imm
