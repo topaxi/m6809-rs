@@ -11,13 +11,9 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
   },
-  serve: {
-    content: './dist',
-    port: 4420
-  },
   mode: process.env.WEBPACK_SERVE ? 'development' : 'production',
   plugins: [
-    new CleanWebpackPlugin(['dist']),
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       title: 'Motorola 6809',
       template: path.resolve(__dirname, 'index.html'),

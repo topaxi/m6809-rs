@@ -1,6 +1,5 @@
 import { formatByte, formatWord } from './src/utils'
 import './src/create-element'
-import 'core-js/modules/es7.array.flat-map'
 
 Object.assign(window, {
   logOpcode(pc, op) {
